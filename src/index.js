@@ -284,7 +284,7 @@ export default class Gantt {
 
     setup_layers() {
         this.layers = {};
-        const layers = ['grid', 'date', 'arrow', 'progress', 'bar', 'details'];
+        const layers = ['grid', 'arrow', 'progress', 'bar', 'details', 'date'];
         // make group layers
         for (let layer of layers) {
             this.layers[layer] = createSVG('g', {
@@ -366,7 +366,7 @@ export default class Gantt {
             width: header_width,
             height: header_height,
             class: 'grid-header',
-            append_to: this.layers.grid
+            append_to: this.layers.date
         });
     }
 
@@ -732,6 +732,10 @@ export default class Gantt {
             is_dragging = false;
             is_resizing_left = false;
             is_resizing_right = false;
+        });
+
+        $.on(document, 'scroll', e => {
+            this.layers.date.setAttribute('transform', 'translate(0,'+ (Math.max(0, -(this.$container.getBoundingClientRect().y))) +')');
         });
 
         $.on(this.$svg, 'mouseup', e => {
