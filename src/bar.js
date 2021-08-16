@@ -243,6 +243,39 @@ export default class Bar {
         this.update_arrow_position();
     }
 
+    update_label_position_on_horizontal_scroll({ x, sx }) {
+        
+        const container = document.querySelector('.gantt-container');
+        const label = this.group.querySelector('.bar-label');
+        const img = this.group.querySelector('.bar-img') || '';
+        const img_mask = this.bar_group.querySelector('.img_mask') || '';
+
+        let barWidthLimit = this.$bar.getX() + this.$bar.getWidth();
+        let newLabelX = label.getX() + x;
+        let newImgX = img && img.getX() + x || 0;
+        let imgWidth = img && img.getBBox().width + 7 || 7;
+        let labelEndX = newLabelX + label.getBBox().width + 7;
+        let viewportCentral = sx + container.clientWidth / 2;
+
+        if (label.classList.contains('big')) return;
+        
+        if (labelEndX < barWidthLimit && x > 0 && labelEndX < viewportCentral) {
+            label.setAttribute('x', newLabelX );
+            if (img) { 
+                img.setAttribute('x', newImgX);
+                img_mask.setAttribute('x', newImgX);
+            }
+        } else if ( (newLabelX - imgWidth)  > this.$bar.getX() && x < 0 && labelEndX > viewportCentral ){
+            label.setAttribute('x', newLabelX );
+            if (img) {
+                img.setAttribute('x', newImgX);
+                img_mask.setAttribute('x', newImgX);
+            }
+            
+        }
+        
+    }
+
     date_changed() {
         let changed = false;
         const { new_start_date, new_end_date } = this.compute_start_end_date();
