@@ -703,39 +703,6 @@ class Bar {
         this.update_arrow_position();
     }
 
-    update_label_position_on_horizontal_scroll({ x, sx }) {
-        
-        const container = document.querySelector('.gantt-container');
-        const label = this.group.querySelector('.bar-label');
-        const img = this.group.querySelector('.bar-img') || '';
-        const img_mask = this.bar_group.querySelector('.img_mask') || '';
-
-        let barWidthLimit = this.$bar.getX() + this.$bar.getWidth();
-        let newLabelX = label.getX() + x;
-        let newImgX = img && img.getX() + x || 0;
-        let imgWidth = img && img.getBBox().width + 7 || 7;
-        let labelEndX = newLabelX + label.getBBox().width + 7;
-        let viewportCentral = sx + container.clientWidth / 2;
-
-        if (label.classList.contains('big')) return;
-        
-        if (labelEndX < barWidthLimit && x > 0 && labelEndX < viewportCentral) {
-            label.setAttribute('x', newLabelX );
-            if (img) { 
-                img.setAttribute('x', newImgX);
-                img_mask.setAttribute('x', newImgX);
-            }
-        } else if ( (newLabelX - imgWidth)  > this.$bar.getX() && x < 0 && labelEndX > viewportCentral ){
-            label.setAttribute('x', newLabelX );
-            if (img) {
-                img.setAttribute('x', newImgX);
-                img_mask.setAttribute('x', newImgX);
-            }
-            
-        }
-        
-    }
-
     date_changed() {
         let changed = false;
         const { new_start_date, new_end_date } = this.compute_start_end_date();
@@ -1705,7 +1672,6 @@ class Gantt {
     bind_bar_events() {
         let is_dragging = false;
         let x_on_start = 0;
-        let x_on_scroll_start = 0;
         let y_on_start = 0;
         let is_resizing_left = false;
         let is_resizing_right = false;
@@ -1800,32 +1766,7 @@ class Gantt {
         });
 
         $.on(this.$container, 'scroll', e => {
-
-            let elements = document.querySelectorAll('.bar-wrapper');
-            let localBars = [];
-            const ids = [];
-            let dx;
-            
             this.layers.date.setAttribute('transform', 'translate(0,'+ e.currentTarget.scrollTop +')');
-
-            if (x_on_scroll_start) {
-                dx = e.currentTarget.scrollLeft - x_on_scroll_start;
-            }
-
-            Array.prototype.forEach.call(elements, function(el, i){
-                ids.push(el.getAttribute('data-id'));
-            });
-
-            if (dx) {
-                localBars = ids.map(id => this.get_bar(id));
-            
-                localBars.forEach(bar => {
-                    bar.update_label_position_on_horizontal_scroll({ x: dx, sx: e.currentTarget.scrollLeft });
-                });
-            }
-            
-            x_on_scroll_start = e.currentTarget.scrollLeft;
-
        });
 
         $.on(this.$svg, 'mouseup', e => {
