@@ -727,7 +727,13 @@ export default class Gantt {
 
         document.addEventListener('mouseup', e => {
             if (is_dragging || is_resizing_left || is_resizing_right) {
-                bars.forEach(bar => bar.group.classList.remove('active'));
+                bars.forEach(bar => {
+                    bar.group.classList.remove('active');
+                    const $bar = bar.$bar;
+                    if (!$bar.finaldx) return;
+                    bar.date_changed();
+                    bar.set_action_completed();
+                });
             }
 
             is_dragging = false;
