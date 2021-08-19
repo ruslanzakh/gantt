@@ -87,6 +87,7 @@ export default class Gantt {
             popup_trigger: 'click',
             custom_popup_html: null,
             disallow_popup: false,
+            fixed_header: false,
             language: 'en'
         };
         this.options = Object.assign({}, default_options, options);
@@ -740,9 +741,11 @@ export default class Gantt {
             is_resizing_right = false;
         });
 
-        $.on(this.$container, 'scroll', e => {
-            this.layers.date.setAttribute('transform', 'translate(0,'+ e.currentTarget.scrollTop +')');
-       });
+        if(this.options.fixed_header) {
+            $.on(this.$container, 'scroll', e => {
+                this.layers.date.setAttribute('transform', 'translate(0,'+ e.currentTarget.scrollTop +')');
+            });
+        }
 
         $.on(this.$svg, 'mouseup', e => {
             this.bar_being_dragged = null;
